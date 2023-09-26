@@ -1,9 +1,10 @@
 import os
-from pydantic import BaseSettings, SecretStr
+from pydantic_settings import BaseSettings
+from pydantic import SecretStr
 
 class Settings(BaseSettings):
     DATABASE_USERNAME: str
-    DATABASE_PASSWORD: SecretStr
+    DATABASE_PASSWORD: str  # Use str here, not SecretStr
     DATABASE_HOSTNAME: str
     DATABASE_PORT: str
     DATABASE_NAME: str
@@ -23,3 +24,6 @@ class Settings(BaseSettings):
                 for line in f:
                     key, value = line.split("=")
                     setattr(self, key.strip(), value.strip())
+
+        # Convert the DATABASE_PASSWORD to SecretStr after reading from .env
+        self.DATABASE_PASSWORD = SecretStr(self.DATABASE_PASSWORD)

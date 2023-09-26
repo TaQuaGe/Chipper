@@ -8,7 +8,7 @@ from app.services.user import (
     get_user_by_id,
     get_user_by_email,
     get_all_users,
-    create_user,
+    create_user as service_create_user,  # Rename the function here
     update_user,
     delete_user,
 )
@@ -28,7 +28,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @router.post("/users/", response_model=UserInDB, status_code=status.HTTP_201_CREATED)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     """Create a new user."""
-    return create_user(db, user)
+    return service_create_user(db, user)  # Call the renamed function
 
 @router.put("/users/{user_id}", response_model=UserInDB)
 def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):

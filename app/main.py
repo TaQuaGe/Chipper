@@ -1,11 +1,34 @@
+from dotenv import load_dotenv
+load_dotenv()  # Load variables from .env file
+from functools import lru_cache
+from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi import FastAPI
+from app.models import base
 from app.api.routes import authentication, products, cart, users, orders, reviews, miscellaneous
 from sqlalchemy.orm import Session
 from app.config import Settings
+from app.db.session import engine, Base
+from app import models
+
+app = FastAPI()
+
+
+origins = [
+    "http://localhost:3000"
+]
+
+
+@lru_cache()
+def get_settings():
+    return Settings()
+
+
 
 settings = Settings()
 
 def create_app() -> FastAPI:
+    
     app = FastAPI(title=settings.PROJECT_NAME, debug=settings.DEBUG)
 
     # Include API routes
@@ -19,9 +42,23 @@ def create_app() -> FastAPI:
 
     return app
 
-
 app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=settings.HOST, port=settings.PORT)
+    
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+Base.metadata.create_all(bind=engine)
+
+@app.get("/", tags=["Main"])
+def read_root():
+    return {"message": "Welcome to the Chipper API"}
+

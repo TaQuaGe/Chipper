@@ -4,9 +4,6 @@ from jose import jwt, JWTError
 from typing import Optional
 from app.config import Settings
 
-settings= Settings()
-
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password, hashed_password):
@@ -15,12 +12,12 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-# Token settings
-SECRET_KEY = settings.SECRET_KEY
-ALGORITHM = settings.ALGORITHM
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
-
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    settings = Settings()  # Initialize settings here
+    SECRET_KEY = settings.SECRET_KEY
+    ALGORITHM = settings.ALGORITHM
+    ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -31,6 +28,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def decode_jwt_token(token: str):
+    settings = Settings()  # Initialize settings here
+    SECRET_KEY = settings.SECRET_KEY
+    ALGORITHM = settings.ALGORITHM
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
