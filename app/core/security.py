@@ -7,33 +7,39 @@ from app.config import Settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+  """Verifies a plain password against a hashed password."""
+  return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+  """Generates a hashed password from a plain password."""
+  return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    settings = Settings()  # Initialize settings here
-    SECRET_KEY = settings.SECRET_KEY
-    ALGORITHM = settings.ALGORITHM
-    ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+  """Creates an access token from a given payload."""
+  settings = Settings()  # Initialize settings here
 
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+  SECRET_KEY = settings.SECRET_KEY
+  ALGORITHM = settings.ALGORITHM
+  ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+
+  to_encode = data.copy()
+  if expires_delta:
+    expire = datetime.utcnow() + expires_delta
+  else:
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+  to_encode.update({"exp": expire})
+  encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+  return encoded_jwt
 
 def decode_jwt_token(token: str):
-    settings = Settings()  # Initialize settings here
-    SECRET_KEY = settings.SECRET_KEY
-    ALGORITHM = settings.ALGORITHM
+  """Decodes an access token and returns the payload."""
+  settings = Settings()  # Initialize settings here
 
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError:
-        return None
+  SECRET_KEY = settings.SECRET_KEY
+  ALGORITHM = settings.ALGORITHM
+
+  try:
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload
+  except JWTError:
+    return None
