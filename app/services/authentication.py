@@ -1,12 +1,12 @@
-import os
+# app/api/services/authentication.py
+
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from app.core.security import verify_password, create_access_token, decode_jwt_token
 from app.models.user import User
 from app.schemas.user import UserInDB
-from app.core.security import get_password_hash  # Import the get_password_hash function
-from pydantic import ValidationError  # Import the ValidationError class
-
+from pydantic import ValidationError
+from app.core.security import get_password_hash
 
 from datetime import timedelta
 
@@ -25,11 +25,11 @@ def authenticate_user(email: str, password: str) -> UserInDB:
     return user
 
 
-def create_user(username: str, password: str):
+def create_user(email: str, password: str) -> UserInDB:
     """Create a new user."""
     try:
-        user = User(username=username, password=get_password_hash(password))
-        user.create()
+        user = User(email=email, hashed_password=get_password_hash(password))
+        user.create()  # Assuming this method exists in your User model
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.errors())
 

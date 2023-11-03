@@ -25,5 +25,4 @@ class Settings(BaseSettings):
                     key, value = line.split("=")
                     setattr(self, key.strip(), value.strip())
 
-        # Convert the DATABASE_PASSWORD to SecretStr after reading from .env
-        self.DATABASE_PASSWORD = SecretStr(self.DATABASE_PASSWORD)
+        
